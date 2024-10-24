@@ -468,6 +468,63 @@ def process_schools(input_csv, output_csv):
             if logo_url:
                 print(f"Found logo for {school_name}: {logo_url}")
 
+                # Save the logo as PNG with a lowercase filename
+                formatted_name = "_".join(school_name.split()).lower()
+                logo_path = os.path.join(LOGO_DIR, f"{formatted_name}.png")
+                download_image(logo_url, logo_path)
+
+                # Update the logo status
+                df.at[index, "Logo Status"] = "Found"
+            else:
+                print(f"No logo found for {school_name}")
+                df.at[index, "Logo Status"] = "Not Found"
+        else:
+            print(f"No website found for {school_name}")
+            df.at[index, "Website"] = ""  # Leave the website column empty
+            df.at[index, "Logo Status"] = "No Website"
+
+    # Save the updated CSV with the school name, entity code, website, and logo status
+    df.to_csv(output_csv, index=False)
+    print(f"Updated CSV saved as {output_csv}")
+
+    # Close the Selenium driver
+    driver.quit()
+
+    """
+    Process each school in the CSV and save logos while updating the CSV file.
+
+    Parameters:
+        input_csv (str): The path to the input CSV file containing school names and entity codes.
+        output_csv (str): The path to the output CSV file that will include the school name, entity code, website, and logo status.
+    """
+    # Read the CSV file and ensure 'Entity Code' is treated as a string
+    df = pd.read_csv(input_csv, dtype={"Entity Code": str})
+
+    # Ensure entity codes are formatted with leading zeros to be exactly 5 digits
+    df["Entity Code"] = df["Entity Code"].apply(lambda x: x.zfill(5))
+
+    # Add new columns for storing the website URLs and logo status
+    df["Website"] = ""
+    df["Logo Status"] = ""
+
+    # Set up the Selenium driver
+    driver = setup_driver()
+
+    for index, row in df.iterrows():
+        school_name = row["School Name"].strip()
+        entity_code = row["Entity Code"].strip()
+
+        # Search for the school's website using the entity code
+        website = search_website(driver, entity_code)
+        if website:
+            df.at[index, "Website"] = website
+            print(f"Found website for {school_name}: {website}")
+
+            # Find the logo on the website
+            logo_url = find_logo(website)
+            if logo_url:
+                print(f"Found logo for {school_name}: {logo_url}")
+
                 # Save the logo as PNG
                 formatted_name = "_".join(school_name.split())
                 logo_path = os.path.join(LOGO_DIR, f"{formatted_name}.png")
