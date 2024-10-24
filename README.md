@@ -1,57 +1,45 @@
 # School Logo Scraper
 
-This Python program takes a CSV file containing school district names and addresses, searches the internet for each school’s website using the Google Custom Search API, finds the school’s logo, and saves it as a PNG file. The program also updates the CSV file to include the school’s website.
+This Python program takes a CSV file containing school district names and their entity codes, searches the MI School Data Education Map for each school’s website, finds the school’s logo, and saves it as a PNG file. The program also updates the CSV file to include the school’s website.
 
 ## Features
-- Searches for each school’s official website based on its name and address.
-- Scrapes the website to find the school’s logo.
-- Saves the logo image as a PNG file in a specified directory.
-- Updates the CSV file with the found website URLs.
+- Searches for each school’s official website based on its entity code using MI School Data's Education Map.
+- Scrapes the school’s homepage for a logo and saves it as a PNG.
+- Updates the CSV file to include the school’s website.
 
 ## Requirements
 Before running the program, ensure you have the following Python libraries installed:
+- `pandas`
 - `requests`
 - `beautifulsoup4`
-- `pandas`
-- `google-api-python-client`
-- `Pillow`
+- `selenium`
+- `pillow`
 
 You can install these libraries using pip:
 
 ```bash
-pip install requests beautifulsoup4 pandas google-api-python-client Pillow
+pip install pandas requests beautifulsoup4 selenium pillow
 ```
 
+Additionally, you need to download [ChromeDriver](https://chromedriver.chromium.org/downloads) and ensure it's in your PATH or specify its location in the script.
+
 ## Setup
-1. **API Setup**:
-   - Set up the Google Custom Search API by creating a project in the [Google Cloud Console](https://console.cloud.google.com/).
-   - Enable the **Custom Search API**.
-   - Generate an **API Key**.
-   - Create a **Custom Search Engine** [here](https://cse.google.com/) and restrict it to educational domains (like `.edu` or `k12` if applicable). Copy the **Search Engine ID**.
+1. **Web Driver Setup**:
+   - Download the appropriate version of ChromeDriver that matches your Chrome browser version.
+   - Place it in a directory and update the `CHROME_DRIVER_PATH` variable in the script with the correct path.
 
-2. **Set Environment Variables**:
-   - Set the following environment variables with your API Key and Search Engine ID:
-     - `GOOGLE_API_KEY`: Your API Key from Google Custom Search.
-     - `SEARCH_ENGINE_ID`: Your Custom Search Engine ID.
+2. **Input CSV File**:
+   - Prepare your CSV file with the following columns:
+     - **School Name**: The name of the school district.
+     - **Entity Code**: The entity code of the school.
+
+   You can use the provided template CSV file (`schools_template_updated.csv`) as a starting point.
+
+3. **Environment Configuration**:
+   - Make sure your environment has ChromeDriver installed and the location set correctly in the script.
    
-   - On **Windows**:
-     ```bash
-     set GOOGLE_API_KEY=your_api_key
-     set SEARCH_ENGINE_ID=your_search_engine_id
-     ```
-   - On **Mac/Linux**:
-     ```bash
-     export GOOGLE_API_KEY=your_api_key
-     export SEARCH_ENGINE_ID=your_search_engine_id
-     ```
-
 ## Usage
-1. Prepare your CSV file with the following columns:
-   - **School Name**: The name of the school district.
-   - **Address**: The address of the school district.
-
-   You can use the provided template CSV file (`schools_template.csv`) as a starting point.
-
+1. Ensure your input CSV file (`schools.csv`) has the correct format (School Name and Entity Code columns).
 2. Run the program by executing the Python script:
    ```bash
    python school_logo_scraper.py
@@ -59,37 +47,39 @@ pip install requests beautifulsoup4 pandas google-api-python-client Pillow
 
 3. The program will:
    - Read the input CSV file.
-   - Search for each school’s website.
+   - Search MI School Data Education Map for each school’s website using the entity code.
    - Scrape the website for the school logo.
    - Save the logo as a PNG in the `logos` directory.
-   - Update the CSV file to include the website URL for each school.
+   - Update the CSV file to include the school name, entity code, and website.
 
-4. The output CSV file (`schools_with_websites.csv`) will be saved in the same directory, containing the original information plus a new column for the website.
+4. The output CSV file (`schools_with_websites.csv`) will be saved in the same directory, containing the updated information.
 
 ## Files
 - **school_logo_scraper.py**: The main Python script that processes the CSV file and saves logos.
-- **schools_template.csv**: A template CSV file you can use to input school names and addresses.
+- **schools_template_updated.csv**: A template CSV file you can use to input school names and entity codes.
 - **logos/**: A directory where the program saves the logos as PNG files.
 
 ## Troubleshooting
-- **API Quota Limit**: Ensure you have sufficient quota for Google’s Custom Search API. The free tier has a limited number of searches per day.
-- **Logo Not Found**: The program uses common patterns (like `<img>` tags with specific classes or attributes) to locate logos. If the logo is not found, it may be due to a different HTML structure on the school’s website.
+- **Class Names or XPath Issues**: If the program fails to locate elements on the MI School Data website, inspect the elements using the browser’s developer tools (`F12`) and adjust the class names or XPaths in the script accordingly.
+- **WebDriver Errors**: Ensure that ChromeDriver matches the version of Chrome installed on your system and that the path is correctly set in the script.
+- **Connection Issues**: If the website loads slowly, you may need to increase the waiting time (`WebDriverWait`) in the script.
 
 ## Dependencies
 - Python 3.x
-- Google Custom Search API access
+- ChromeDriver installed and configured in your PATH or specified in the script.
 
 ## Notes
-- Make sure to keep your API Key secure and not expose it in public code repositories.
-- The program includes error handling to continue processing even if errors occur (e.g., if a school website or logo is not found).
+- This program uses web scraping with Selenium; it may need updates if the MI School Data website changes its structure or element IDs/classes.
+- Always ensure that your ChromeDriver version matches your Chrome browser version.
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 ```
 
-### Explanation:
-- The `README.md` explains the purpose of the program, setup instructions, usage, and troubleshooting tips.
-- It provides a step-by-step guide on setting up the environment variables and running the script.
-- Additional information about dependencies and file organization is included to help users understand the program's structure.
+### Summary of Changes
+- Updated the program details to reflect the use of MI School Data Education Map for retrieving school websites based on entity codes.
+- Modified the CSV structure and instructions to align with the new input format (school name and entity code).
+- Added troubleshooting tips specific to Selenium and web scraping.
+- Provided instructions on setting up and configuring ChromeDriver.
 
-Feel free to adjust the file based on your preferences or further customizations!
+This `README.md` file should now accurately guide users in setting up and running the updated program. Let me know if you need further adjustments!
