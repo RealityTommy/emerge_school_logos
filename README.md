@@ -1,85 +1,96 @@
-# School Logo Scraper
+# School Website and Logo Scraper
 
-This Python program takes a CSV file containing school district names and their entity codes, searches the MI School Data Education Map for each school’s website, finds the school’s logo, and saves it as a PNG file. The program also updates the CSV file to include the school’s website.
+This project is a Python application that uses Selenium and BeautifulSoup to search for school websites using their entity codes from the MI School Data Education Map and attempts to find and download the school's logo from their website. The program outputs a CSV file that includes information about the school, the website, and the logo status.
 
-## Features
-- Searches for each school’s official website based on its entity code using MI School Data's Education Map.
-- Scrapes the school’s homepage for a logo and saves it as a PNG.
-- Updates the CSV file to include the school’s website.
+## Table of Contents
+- [Requirements](#requirements)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Input CSV Format](#input-csv-format)
+- [Output CSV Format](#output-csv-format)
+- [Troubleshooting](#troubleshooting)
+- [Notes](#notes)
 
 ## Requirements
-Before running the program, ensure you have the following Python libraries installed:
-- `pandas`
-- `requests`
-- `beautifulsoup4`
-- `selenium`
-- `pillow`
 
-You can install these libraries using pip:
+Ensure you have the following Python packages installed:
+
+- `pandas`
+- `selenium`
+- `beautifulsoup4`
+- `requests`
+- `Pillow`
+
+You can install these dependencies using:
 
 ```bash
-pip install pandas requests beautifulsoup4 selenium pillow
+pip install pandas selenium beautifulsoup4 requests Pillow
 ```
 
-Additionally, you need to download [ChromeDriver](https://chromedriver.chromium.org/downloads) and ensure it's in your PATH or specify its location in the script.
+### Additional Requirements
+
+- **Google Chrome**: The program uses ChromeDriver, so Google Chrome must be installed.
+- **ChromeDriver**: Download the ChromeDriver matching your Chrome version from [ChromeDriver Download](https://chromedriver.chromium.org/downloads) and set the `CHROME_DRIVER_PATH` environment variable to the path of the ChromeDriver executable.
 
 ## Setup
-1. **Web Driver Setup**:
-   - Download the appropriate version of ChromeDriver that matches your Chrome browser version.
-   - Place it in a directory and update the `CHROME_DRIVER_PATH` variable in the script with the correct path.
 
-2. **Input CSV File**:
-   - Prepare your CSV file with the following columns:
-     - **School Name**: The name of the school district.
-     - **Entity Code**: The entity code of the school.
+1. **Download and Set Up ChromeDriver**:
+   - Download ChromeDriver matching your Chrome version.
+   - Move the `chromedriver` file to a known location (e.g., `/usr/local/bin/`).
+   - Set the environment variable for `CHROME_DRIVER_PATH`:
+     ```bash
+     export CHROME_DRIVER_PATH=/path/to/chromedriver
+     ```
 
-   You can use the provided template CSV file (`schools_template_updated.csv`) as a starting point.
+2. **Directory for Logos**:
+   - The program saves logos in a directory called `logos`. Ensure that this directory exists in the same location as the script, or it will be created automatically.
 
-3. **Environment Configuration**:
-   - Make sure your environment has ChromeDriver installed and the location set correctly in the script.
-   
 ## Usage
-1. Ensure your input CSV file (`schools.csv`) has the correct format (School Name and Entity Code columns).
-2. Run the program by executing the Python script:
-   ```bash
-   python school_logo_scraper.py
-   ```
 
-3. The program will:
-   - Read the input CSV file.
-   - Search MI School Data Education Map for each school’s website using the entity code.
-   - Scrape the website for the school logo.
-   - Save the logo as a PNG in the `logos` directory.
-   - Update the CSV file to include the school name, entity code, and website.
+Run the program with the following command:
 
-4. The output CSV file (`schools_with_websites.csv`) will be saved in the same directory, containing the updated information.
-
-## Files
-- **school_logo_scraper.py**: The main Python script that processes the CSV file and saves logos.
-- **schools_template_updated.csv**: A template CSV file you can use to input school names and entity codes.
-- **logos/**: A directory where the program saves the logos as PNG files.
-
-## Troubleshooting
-- **Class Names or XPath Issues**: If the program fails to locate elements on the MI School Data website, inspect the elements using the browser’s developer tools (`F12`) and adjust the class names or XPaths in the script accordingly.
-- **WebDriver Errors**: Ensure that ChromeDriver matches the version of Chrome installed on your system and that the path is correctly set in the script.
-- **Connection Issues**: If the website loads slowly, you may need to increase the waiting time (`WebDriverWait`) in the script.
-
-## Dependencies
-- Python 3.x
-- ChromeDriver installed and configured in your PATH or specified in the script.
-
-## Notes
-- This program uses web scraping with Selenium; it may need updates if the MI School Data website changes its structure or element IDs/classes.
-- Always ensure that your ChromeDriver version matches your Chrome browser version.
-
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+```bash
+python main.py
 ```
 
-### Summary of Changes
-- Updated the program details to reflect the use of MI School Data Education Map for retrieving school websites based on entity codes.
-- Modified the CSV structure and instructions to align with the new input format (school name and entity code).
-- Added troubleshooting tips specific to Selenium and web scraping.
-- Provided instructions on setting up and configuring ChromeDriver.
+Make sure to adjust the file paths in `main.py` to point to your input and output CSV files.
 
-This `README.md` file should now accurately guide users in setting up and running the updated program. Let me know if you need further adjustments!
+## Input CSV Format
+
+The input CSV file should have the following columns:
+
+| School Name           | Entity Code |
+|-----------------------|-------------|
+| Example High School   | 03535       |
+| Another School        | 12345       |
+| Sample Elementary     | 67890       |
+
+- **School Name**: The name of the school.
+- **Entity Code**: The 5-digit entity code for the school (leading zeros must be included).
+
+## Output CSV Format
+
+The output CSV file will have the following columns:
+
+| School Name           | Entity Code | Website                       | Logo Status   |
+|-----------------------|-------------|------------------------------|---------------|
+| Example High School   | 03535       | https://examplehigh.edu      | Found         |
+| Another School        | 12345       | https://anotherschool.org    | Not Found     |
+| Sample Elementary     | 67890       |                              | No Website    |
+
+- **Website**: The URL of the school's website (left empty if no website is found).
+- **Logo Status**:
+  - `"Found"`: If a logo is successfully located and downloaded.
+  - `"Not Found"`: If a school’s website is found, but no logo is detected.
+  - `"No Website"`: If no website is found for the school.
+
+## Troubleshooting
+
+- **Website not found**: If the program cannot find a website, ensure that the entity code is correct and that the MI School Data site is accessible.
+- **Logo not found**: Not all websites have a clear pattern for logo identification. You may need to inspect the website manually if logos are frequently missed.
+- **ChromeDriver Issues**: Ensure the ChromeDriver version matches your Google Chrome version and the `CHROME_DRIVER_PATH` is correctly set.
+
+## Notes
+
+- **Running the program in non-headless mode**: For debugging, you can run the program with a visible browser by commenting out the `"--headless"` option in the `setup_driver` function.
+- **Rate Limiting**: Be mindful of accessing the MI School Data site too frequently, as excessive requests might lead to temporary IP bans.
