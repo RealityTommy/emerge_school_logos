@@ -1,6 +1,6 @@
-# School Logo Scraper
+# School Website Logo Scraper
 
-This Python program scrapes the MI School Data website to find school websites and download their logos. The program uses Selenium, BeautifulSoup, and requests to automate this process.
+This Python program scrapes the MI School Data website to find school websites and download their logos. The program uses Selenium, BeautifulSoup, and requests to automate this process. It provides real-time statistics, including the number of successes and failures and the time taken for each operation.
 
 ## Project Structure
 
@@ -8,18 +8,15 @@ This Python program scrapes the MI School Data website to find school websites a
 project-directory/
 │
 ├── input/
-│   └── schools.csv         # Your input CSV file should be placed here
+│   └── schools_input.csv   # Your input CSV file should be placed here
 │
 ├── output/
 │   ├── logos/              # This directory will contain downloaded logos
-│   └── schools_with_websites.csv  # Output CSV with processed data
+│   └── schools_output.csv  # Output CSV with processed data
 │
-├── app/
-│   └── main.py             # The main script to run the program
-│
-├── requirements.txt
-├── README.md
-└── .gitignore
+├── main.py                 # The main script to run the program
+├── .gitignore
+└── README.md
 ```
 
 ## Setup Instructions
@@ -75,7 +72,7 @@ project-directory/
 
 2. **Place your input CSV**:
 
-   - Add your input CSV file (`schools.csv`) to the `input` directory.
+   - Add your input CSV file (`schools_input.csv`) to the `input` directory.
    - The file should contain columns for "School Name" and "Entity Code".
 
 ### Usage
@@ -87,7 +84,13 @@ python main.py
 ```
 
 - The program will process the input CSV, search for school websites, and download logos to the `output/logos` directory.
-- The output CSV file (`schools_with_websites.csv`) will be saved in the `output` directory.
+- The output CSV file (`schools_output.csv`) will be saved in the `output` directory.
+
+### Program Features
+
+- **Progress Bar**: Displays the progress as schools are processed.
+- **Ongoing Stats**: Shows real-time counts of successes and failures.
+- **Time Tracking**: Displays the time taken for each school and the total elapsed time since the program started.
 
 ### Notes
 
@@ -105,13 +108,16 @@ python main.py
 ### Troubleshooting
 
 1. **Input CSV Not Found**:
-   - Make sure the file is located in the `input` directory and is named correctly (e.g., `schools.csv`).
+   - Make sure the file is located in the `input` directory and is named correctly (e.g., `schools_input.csv`).
 
 2. **WebDriver Errors**:
    - Ensure `CHROME_DRIVER_PATH` points to the correct ChromeDriver executable compatible with your Chrome version.
 
 3. **Permissions Errors**:
    - Ensure that the script has permission to read and write files in the `input` and `output` directories.
+
+4. **Slow Operations**:
+   - The program sets a timeout for each operation (searching for the website and downloading the logo). If an operation exceeds the set timeout, it will move on to the next school.
 
 ## License
 

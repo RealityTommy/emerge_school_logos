@@ -13,6 +13,7 @@ from PIL import Image
 from io import BytesIO
 import re
 from tqdm import tqdm
+import time
 
 # Set up the paths based on environment variables
 OUTPUT_BASE_PATH = os.getenv(
@@ -45,20 +46,21 @@ def setup_driver():
     return driver
 
 
-def search_website(driver, entity_code):
+def search_website(driver, entity_code, timeout=15):
     """
     Search for the school's website using the MI School Data Education Map.
 
     Parameters:
         driver: Selenium WebDriver instance.
         entity_code (str): The entity code for the school.
+        timeout (int): Timeout in seconds for the search operation.
 
     Returns:
         str: The website URL if found, otherwise None.
     """
     try:
         driver.get("https://mischooldata.org/education-map/")
-        wait = WebDriverWait(driver, 10)
+        wait = WebDriverWait(driver, timeout)
 
         search_box = wait.until(
             EC.presence_of_element_located((By.ID, "insertMapSearch"))
@@ -85,21 +87,22 @@ def search_website(driver, entity_code):
 
     except Exception as e:
         print(f"Error finding website for entity code {entity_code}: {e}")
-    return None
+        return None
 
 
-def find_logo(url):
+def find_logo(url, timeout=15):
     """
     Find the logo image on the school's website.
 
     Parameters:
         url (str): The school's website URL.
+        timeout (int): Timeout in seconds for the request.
 
     Returns:
         str: The logo image URL if found, otherwise None.
     """
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=timeout)
         soup = BeautifulSoup(response.text, "html.parser")
         logo = (
             soup.find("img", {"alt": "logo"})
@@ -116,16 +119,17 @@ def find_logo(url):
     return None
 
 
-def download_image(url, save_path):
+def download_image(url, save_path, timeout=15):
     """
     Download the image from the given URL and save it as a PNG.
 
     Parameters:
         url (str): The URL of the image to download.
         save_path (str): The local path where the image will be saved.
+        timeout (int): Timeout in seconds for the download request.
     """
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=timeout)
         image = Image.open(BytesIO(response.content))
         image.save(save_path, "PNG")
     except Exception as e:
@@ -141,17 +145,22 @@ def process_schools(input_csv, output_csv):
         output_csv (str): The path to the output CSV file that will include the school name, entity code, website, and logo status.
     """
     df = pd.read_csv(input_csv, dtype={"Entity Code": str})
-
     df["Entity Code"] = df["Entity Code"].apply(lambda x: x.zfill(5))
-
     df["Website"] = ""
     df["Logo Status"] = ""
 
+    success_count = 0
+    failure_count = 0
+
     driver = setup_driver()
+
+    start_time = time.time()  # Track total start time
 
     for index, row in tqdm(df.iterrows(), total=df.shape[0], desc="Processing schools"):
         school_name = row["School Name"].strip()
         entity_code = row["Entity Code"].strip()
+
+        operation_start_time = time.time()  # Track start time for each operation
 
         website = search_website(driver, entity_code)
         if website:
@@ -170,16 +179,31 @@ def process_schools(input_csv, output_csv):
                 if not os.path.exists(logo_path):
                     download_image(logo_url, logo_path)
                     df.at[index, "Logo Status"] = "Found"
+                    success_count += 1
                 else:
                     print(f"Logo for {school_name} already exists. Skipping download.")
                     df.at[index, "Logo Status"] = "Already Exists"
+                    success_count += 1
             else:
                 print(f"No logo found for {school_name}")
                 df.at[index, "Logo Status"] = "Not Found"
+                failure_count += 1
         else:
             print(f"No website found for {school_name}")
             df.at[index, "Website"] = ""
             df.at[index, "Logo Status"] = "No Website"
+            failure_count += 1
+
+        operation_end_time = time.time()
+        elapsed_operation_time = operation_end_time - operation_start_time
+        total_elapsed_time = operation_end_time - start_time
+
+        # Display ongoing stats for successes, failures, and time taken
+        print()
+        print(f"Time taken for {school_name}: {elapsed_operation_time:.2f} seconds")
+        print(f"Total elapsed time: {total_elapsed_time:.2f} seconds")
+        print(f"Successes: {success_count}, Failures: {failure_count}")
+        print()
 
     output_csv_path = os.path.join(OUTPUT_DIR, output_csv)
     df.to_csv(output_csv_path, index=False)
