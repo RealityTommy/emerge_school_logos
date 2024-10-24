@@ -1,96 +1,118 @@
-# School Website and Logo Scraper
+# School Logo Scraper
 
-This project is a Python application that uses Selenium and BeautifulSoup to search for school websites using their entity codes from the MI School Data Education Map and attempts to find and download the school's logo from their website. The program outputs a CSV file that includes information about the school, the website, and the logo status.
+This Python program scrapes the MI School Data website to find school websites and download their logos. The program uses Selenium, BeautifulSoup, and requests to automate this process.
 
-## Table of Contents
-- [Requirements](#requirements)
-- [Setup](#setup)
-- [Usage](#usage)
-- [Input CSV Format](#input-csv-format)
-- [Output CSV Format](#output-csv-format)
-- [Troubleshooting](#troubleshooting)
-- [Notes](#notes)
+## Project Structure
 
-## Requirements
-
-Ensure you have the following Python packages installed:
-
-- `pandas`
-- `selenium`
-- `beautifulsoup4`
-- `requests`
-- `Pillow`
-
-You can install these dependencies using:
-
-```bash
-pip install pandas selenium beautifulsoup4 requests Pillow
+```
+project-directory/
+│
+├── input/
+│   └── schools.csv         # Your input CSV file should be placed here
+│
+├── output/
+│   ├── logos/              # This directory will contain downloaded logos
+│   └── schools_with_websites.csv  # Output CSV with processed data
+│
+├── app/
+│   └── main.py             # The main script to run the program
+│
+├── requirements.txt
+├── README.md
+└── .gitignore
 ```
 
-### Additional Requirements
+## Setup Instructions
 
-- **Google Chrome**: The program uses ChromeDriver, so Google Chrome must be installed.
-- **ChromeDriver**: Download the ChromeDriver matching your Chrome version from [ChromeDriver Download](https://chromedriver.chromium.org/downloads) and set the `CHROME_DRIVER_PATH` environment variable to the path of the ChromeDriver executable.
+### Prerequisites
 
-## Setup
+- Python 3.7+
+- `pip` (Python package manager)
+- Chrome browser and [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/)
 
-1. **Download and Set Up ChromeDriver**:
-   - Download ChromeDriver matching your Chrome version.
-   - Move the `chromedriver` file to a known location (e.g., `/usr/local/bin/`).
-   - Set the environment variable for `CHROME_DRIVER_PATH`:
-     ```bash
-     export CHROME_DRIVER_PATH=/path/to/chromedriver
-     ```
+### Installation
 
-2. **Directory for Logos**:
-   - The program saves logos in a directory called `logos`. Ensure that this directory exists in the same location as the script, or it will be created automatically.
+1. **Clone the repository**:
 
-## Usage
+   ```bash
+   git clone <repository-url>
+   cd <repository-name>
+   ```
 
-Run the program with the following command:
+2. **Set up a virtual environment**:
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+   ```
+
+3. **Install dependencies**:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Configuration
+
+1. **Set Environment Variables**:
+   
+   - `OUTPUT_DIR_PATH`: The base directory for the output and logos (e.g., `/path/to/project/output`).
+   - `CHROME_DRIVER_PATH`: Path to your ChromeDriver executable (e.g., `/path/to/chromedriver`).
+
+   Example (Linux/macOS):
+
+   ```bash
+   export OUTPUT_DIR_PATH="/path/to/project/output"
+   export CHROME_DRIVER_PATH="/path/to/chromedriver"
+   ```
+
+   Example (Windows):
+
+   ```bash
+   set OUTPUT_DIR_PATH="C:\path\to\project\output"
+   set CHROME_DRIVER_PATH="C:\path\to\chromedriver.exe"
+   ```
+
+2. **Place your input CSV**:
+
+   - Add your input CSV file (`schools.csv`) to the `input` directory.
+   - The file should contain columns for "School Name" and "Entity Code".
+
+### Usage
+
+Run the program:
 
 ```bash
 python main.py
 ```
 
-Make sure to adjust the file paths in `main.py` to point to your input and output CSV files.
+- The program will process the input CSV, search for school websites, and download logos to the `output/logos` directory.
+- The output CSV file (`schools_with_websites.csv`) will be saved in the `output` directory.
 
-## Input CSV Format
+### Notes
 
-The input CSV file should have the following columns:
+- Ensure the ChromeDriver version matches your installed version of Chrome.
+- The input CSV file should be correctly formatted and located in the `input` directory.
 
-| School Name           | Entity Code |
-|-----------------------|-------------|
-| Example High School   | 03535       |
-| Another School        | 12345       |
-| Sample Elementary     | 67890       |
+### Dependencies
 
-- **School Name**: The name of the school.
-- **Entity Code**: The 5-digit entity code for the school (leading zeros must be included).
+- `Selenium`
+- `requests`
+- `pandas`
+- `tqdm`
+- `PIL (Pillow)`
 
-## Output CSV Format
+### Troubleshooting
 
-The output CSV file will have the following columns:
+1. **Input CSV Not Found**:
+   - Make sure the file is located in the `input` directory and is named correctly (e.g., `schools.csv`).
 
-| School Name           | Entity Code | Website                       | Logo Status   |
-|-----------------------|-------------|------------------------------|---------------|
-| Example High School   | 03535       | https://examplehigh.edu      | Found         |
-| Another School        | 12345       | https://anotherschool.org    | Not Found     |
-| Sample Elementary     | 67890       |                              | No Website    |
+2. **WebDriver Errors**:
+   - Ensure `CHROME_DRIVER_PATH` points to the correct ChromeDriver executable compatible with your Chrome version.
 
-- **Website**: The URL of the school's website (left empty if no website is found).
-- **Logo Status**:
-  - `"Found"`: If a logo is successfully located and downloaded.
-  - `"Not Found"`: If a school’s website is found, but no logo is detected.
-  - `"No Website"`: If no website is found for the school.
+3. **Permissions Errors**:
+   - Ensure that the script has permission to read and write files in the `input` and `output` directories.
 
-## Troubleshooting
+## License
 
-- **Website not found**: If the program cannot find a website, ensure that the entity code is correct and that the MI School Data site is accessible.
-- **Logo not found**: Not all websites have a clear pattern for logo identification. You may need to inspect the website manually if logos are frequently missed.
-- **ChromeDriver Issues**: Ensure the ChromeDriver version matches your Google Chrome version and the `CHROME_DRIVER_PATH` is correctly set.
-
-## Notes
-
-- **Running the program in non-headless mode**: For debugging, you can run the program with a visible browser by commenting out the `"--headless"` option in the `setup_driver` function.
-- **Rate Limiting**: Be mindful of accessing the MI School Data site too frequently, as excessive requests might lead to temporary IP bans.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.

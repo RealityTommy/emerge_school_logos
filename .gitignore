@@ -1,70 +1,35 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
+# Python bytecode
 *.py[cod]
-*$py.class
-
-# C extensions
+__pycache__/
 *.so
 
-# Packages
-*.egg
-*.egg-info/
-dist/
-build/
-eggs/
-parts/
-bin/
-var/
-sdist/
-develop-eggs/
-.installed.cfg
-lib/
-lib64/
-__pypackages__/
-
-# PyInstaller
-# Usually these files are written by a python script from a template
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Environments
-.env
-.venv
-env/
+# Virtual environment directory
 venv/
-ENV/
-env.bak/
-venv.bak/
+env/
 
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# dotenv
+# Environment variables file (if using .env)
 .env
-
-# VS Code
-.vscode/
-
-# Sublime Text
-*.sublime-workspace
-
-# macOS
-.DS_Store
 
 # Logs
 *.log
 
-# CSV Files and Data
-schools_with_websites.csv
-schools_template.csv
-*.csv
+# Cache directories
+.cache/
+__pycache__/
 
-# Output directories for logos
-logos/
+# Output and temporary files
+output/
+input/
+*.csv
+*.png
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# PyCharm and VSCode settings
+.idea/
+.vscode/
